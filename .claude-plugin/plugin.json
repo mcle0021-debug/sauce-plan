@@ -1,0 +1,16 @@
+{
+  "name": "sauce-plan",
+  "description": "Exam study planner for Claude Code: turns exam dates, free time and course files into one interactive day-by-day planner page (countdowns, calendar, timed tick-box blocks that sync to your account, links to videos, practice and your own files), and re-plans when you miss a day. Works alongside Study Sauce.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Molly Cleeve"
+  },
+  "keywords": [
+    "study",
+    "exam",
+    "planner",
+    "revision",
+    "timetable",
+    "study-sauce"
+  ]
+}

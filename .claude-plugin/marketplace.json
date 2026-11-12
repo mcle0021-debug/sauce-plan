@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "sauce-plan",
+  "description": "sauce-plan: an exam study planner skill for Claude Code that works alongside Study Sauce.",
+  "owner": {
+    "name": "Molly Cleeve"
+  },
+  "plugins": [
+    {
+      "name": "sauce-plan",
+      "description": "Build a day-by-day exam study planner page from your exam dates, free time and course files, and re-plan when you miss a day.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "source": "./"
+    }
+  ]
+}

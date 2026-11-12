@@ -1,0 +1,486 @@
+<title>@@TITLE@@</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* sauce-plan template. Layout: a revision run-sheet. Sticky header with four exam countdowns, a month grid to pick a day, then one day's blocks as a timed checklist. */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --sunk:#e9ede8; --ink:#18211c; --muted:#5a6760; --line:#d9e0da;
+  --accent:#1d6b58; --accent-ink:#ffffff; --warn:#a4561b; --ok:#2c7a4b;
+  --c1:#3d55b8; --c2:#bb5226; --c3:#2b7f4f; --c4:#8a3c86; --c5:#1f6f8b; --c6:#8a6410; --call:#5a6760;
+  --t1:#e6e9f7; --t2:#f7e8e0; --t3:#e2f1e7; --t4:#f3e5f2; --t5:#e1eff4; --t6:#f4ecd9; --tall:#e9ede8;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111613; --surface:#18201b; --sunk:#1f2822; --ink:#e4ebe6; --muted:#97a69d; --line:#2b3630;
+  --accent:#59c0a2; --accent-ink:#0d1a15; --warn:#e39a5f; --ok:#6bcf92;
+  --c1:#8fa1ff; --c2:#f0905f; --c3:#6fd398; --c4:#e08ad9; --c5:#6cc3e0; --c6:#e0b45a; --call:#97a69d;
+  --t1:#232a46; --t2:#3a271d; --t3:#1d3326; --t4:#36213a; --t5:#1b3440; --t6:#3a3020; --tall:#222b25; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111613; --surface:#18201b; --sunk:#1f2822; --ink:#e4ebe6; --muted:#97a69d; --line:#2b3630;
+  --accent:#59c0a2; --accent-ink:#0d1a15; --warn:#e39a5f; --ok:#6bcf92;
+  --c1:#8fa1ff; --c2:#f0905f; --c3:#6fd398; --c4:#e08ad9; --c5:#6cc3e0; --c6:#e0b45a; --call:#97a69d;
+  --t1:#232a46; --t2:#3a271d; --t3:#1d3326; --t4:#36213a; --t5:#1b3440; --t6:#3a3020; --tall:#222b25; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(26px,5vw,36px);font-weight:700}
+h2{font-size:22px;font-weight:700}
+h3{font-size:17px;font-weight:700}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sub{color:var(--muted);margin-top:4px}
+.mono{font-family:var(--f-mono);font-size:12.5px}
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;justify-content:space-between}
+.sync{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.exams{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+@media (max-width:720px){.exams{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:4px;min-width:0}
+.exam .code{font-family:var(--f-mono);font-weight:500;font-size:13px}
+.exam .days{font-family:var(--f-display);font-size:28px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.exam .meta{font-size:12.5px;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:3px}
+.tabs{display:flex;gap:6px;margin:22px 0 14px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5;border-bottom:1px solid var(--line)}
+.tab{border:1px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:999px;cursor:pointer;font-weight:500}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .dow{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center}
+.cell{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px;min-height:68px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
+.cell.empty{visibility:hidden}
+.cell .d{font-family:var(--f-display);font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
+.cell .h{font-size:11px;color:var(--muted);font-family:var(--f-mono)}
+.cell .dots{display:flex;gap:3px;flex-wrap:wrap}
+.cell .dots i{width:7px;height:7px;border-radius:50%}
+.cell.sel{outline:2px solid var(--accent);outline-offset:1px}
+.cell.today .d::after{content:" today";font-size:10px;font-family:var(--f-mono);color:var(--accent);font-weight:500}
+.cell.exam{border-width:2px}
+.cell .tag{font-size:10.5px;font-weight:600;font-family:var(--f-mono);border-radius:4px;padding:1px 4px;align-self:flex-start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell .fill{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);border-radius:0 0 0 8px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dayhead{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px}
+.dayhead .nav{display:flex;gap:6px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.daymeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.pill{font-size:12px;font-family:var(--f-mono);padding:3px 8px;border-radius:999px;background:var(--sunk);color:var(--ink)}
+.focus{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.focus b{font-family:var(--f-display)}
+.note{margin-top:10px;font-size:13.5px;color:var(--muted)}
+.blocks{display:grid;gap:10px;margin-top:16px}
+.blk{display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--call);border-radius:10px;padding:12px 14px}
+@media (max-width:520px){.blk{grid-template-columns:minmax(0,1fr)}.blk .when{display:flex;gap:8px;align-items:baseline}}
+.blk .when{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.blk .when b{display:block;color:var(--ink);font-weight:500;font-size:14px}
+@media (max-width:520px){.blk .when b{display:inline}}
+.blk .title{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.chip{font-family:var(--f-mono);font-size:11.5px;font-weight:500;padding:2px 7px;border-radius:5px}
+.blk ul{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.blk li label{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;cursor:pointer;align-items:start}
+.blk li input{width:17px;height:17px;margin:2px 0 0;accent-color:var(--accent)}
+.blk li.done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.res a{display:inline-flex;gap:6px;align-items:center;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px;color:var(--ink);max-width:100%}
+.res a:hover{border-color:var(--accent)}
+.res a em{font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.files{margin-top:10px;display:grid;gap:4px}
+.file{display:flex;gap:8px;align-items:center;font-size:12.5px;min-width:0}
+.file .p{font-family:var(--f-mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.file .lbl{font-weight:500;white-space:nowrap}
+.file button{border:1px solid var(--line);background:var(--sunk);border-radius:5px;padding:1px 7px;font-size:11.5px;cursor:pointer;white-space:nowrap}
+.goal{margin-top:10px;font-size:13.5px;padding:8px 10px;border-radius:7px;background:var(--sunk)}
+.goal::before{content:"Done when: ";font-weight:600}
+.brk{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding:0 0 0 14px;display:flex;gap:10px}
+.examblk{border:2px solid var(--ink);border-radius:10px;padding:16px;background:var(--surface);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.examblk .big{font-family:var(--f-display);font-size:24px;font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.panel ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sessions{display:grid;gap:4px}
+.sess{display:grid;grid-template-columns:96px minmax(0,1fr) 54px;gap:10px;font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.sess:hover{color:var(--accent)}
+.sess .n{font-family:var(--f-mono);color:var(--muted);text-align:right}
+.stack{display:grid;gap:14px}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1 id="ptitle">@@TITLE@@</h1>
+      <div class="sub" id="psub"></div>
+    </div>
+    <div class="sync" id="sync">Saved on this device</div>
+  </div>
+  <div class="exams" id="exams"></div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-day" aria-selected="true">Day plan</button>
+    <button class="tab" role="tab" id="tab-subjects" aria-selected="false">Subjects</button>
+    <button class="tab" role="tab" id="tab-method" aria-selected="false">How to study</button>
+  </div>
+
+  <section id="view-day">
+    <div class="cal" id="cal"></div>
+    <div class="legend" id="legend"></div>
+    <div id="day"></div>
+  </section>
+  <section id="view-subjects" hidden></section>
+  <section id="view-method" hidden></section>
+</div>
+
+<script>
+/* ---------- block builders (used by plan.js) ---------- */
+const Y = id => "https://www.youtube.com/watch?v=" + id;
+const V = (label, id) => ["Video", label, Y(id)];       // YouTube video by id
+const R = (label, url) => ["Read", label, url];          // web reading
+const P = (label, url) => ["Practice", label, url];      // practice page, quiz hub, flashcards
+const F = (label, path) => [label, path];                // local file, path relative to CONFIG.base
+/* B(subject, minutes, title, steps[], links[], files[], doneWhen) */
+const B = (s, m, t, d, r, f, g) => ({s, m, t, d: d || [], r: r || [], f: f || [], g: g || ""});
+/* X(subject, label, startMinutes, durationMinutes, room, bring, beforeText): an exam block */
+const X = (s, label, at, m, room, bring, before) => ({s, exam: true, t: label, at, m, room, bring, before});
+/* IV: an interview / viva / oral, drawn like an exam */
+const IV = (...a) => Object.assign(X(...a), {interview: true});
+/* Bat(startMinutes, beforeText, ...B args): a block pinned to a clock time */
+const Bat = (at, before, ...a) => Object.assign(B(...a), {at, before: before || undefined});
+
+/* ---------- the plan (inserted by build.mjs from plan.js) ---------- */
+/*@@PLAN@@*/
+
+/* ---------- defaults for anything plan.js leaves out ---------- */
+const CFG = Object.assign({
+  title: "Exam Planner", subtitle: "", base: "", key: "sauce-plan-done-v1", dayStart: 8 * 60, lms: "Moodle",
+  warmup: true, flexKinds: ["Full study day"], closeout: true, howBuilt: [], examDay: [], classNote: "Class week: fit these blocks around your classes. They’re listed in priority order."
+}, typeof CONFIG === "object" ? CONFIG : {});
+const SEP = /\\/.test(CFG.base) ? "\\" : "/";               // Windows or macOS/Linux paths
+const BASE = CFG.base && !/[\\/]$/.test(CFG.base) ? CFG.base + SEP : CFG.base;
+document.getElementById("psub").textContent = CFG.subtitle;
+if (!SUBJ.ALL) SUBJ.ALL = {code: "ALL", name: "All units"};   // whole-day blocks (warm-up, flex, close-out)
+
+/* add daily warm-up and close-out */
+DAYS.forEach(d => {
+  if (d.warm !== false) {
+    if (CFG.flexKinds.includes(d.kind)) d.blocks.push(B("ALL",45,"Catch-up / flex",["Finish anything unticked from today","All done? Redo one Mistake Log question per unit"]));
+    if (CFG.warmup) d.blocks.unshift(B("ALL",20,"Recall warm-up",["Blank page: write down everything you remember from yesterday’s topics (formulas, methods, steps)","Check against your notes. Anything you missed becomes a flashcard"]));
+    if (CFG.closeout) d.blocks.push(B("ALL",10,"Close out",["Log today’s mistakes in the Mistake Log","Read tomorrow’s plan"]));
+  }
+});
+
+/* ---------- state ---------- */
+const KEY = CFG.key;
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { done = {}; }
+/* CONFIG.markDone = {before: "YYYY-MM-DD", ids: ["day-block-step", ...]} ticks work already done
+   (everything on days before `before`, plus any listed ids). Applied once per change, so later unticks stick. */
+if (CFG.markDone) {
+  const md = CFG.markDone, tag = JSON.stringify(md), mk = KEY + ":marked";
+  let seen = null; try { seen = localStorage.getItem(mk); } catch (e) {}
+  if (seen !== tag) {
+    DAYS.forEach((d, di) => d.blocks.forEach((b, bi) => {
+      if (b.exam) return;
+      b.d.forEach((_, si) => { const id = di + "-" + bi + "-" + si; if ((md.before && d.date < md.before) || (md.ids || []).includes(id)) done[id] = true; });
+    }));
+    try { localStorage.setItem(KEY, JSON.stringify(done)); localStorage.setItem(mk, tag); } catch (e) {}
+  }
+}
+let dbRef = null, writing = Promise.resolve(), saveTimer = null;
+const syncEl = document.getElementById("sync");
+function setSync(t){ syncEl.textContent = t; }
+
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+  if (!dbRef) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const payload = {done: Object.assign({}, done), updated: Date.now()};
+    setSync("Saving…");
+    writing = writing.then(() => dbRef.set(payload)).then(() => setSync("Synced to your account")).catch(() => setSync("Not synced. Saved on this device"));
+  }, 700);
+}
+
+(async () => {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const [user, db] = await Promise.all([claude.use("user"), claude.use("db")]);
+    if (!user || !db) return;
+    const id = await user.id();
+    if (!id) return;
+    dbRef = db.doc("data/users/" + id + "/progress");
+    const snap = await dbRef.get();
+    if (snap.exists) {
+      const d = snap.data() || {};
+      done = Object.assign({}, d.done || {});
+      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+    } else if (Object.keys(done).length) {
+      save();
+    }
+    setSync("Synced to your account");
+    renderAll();
+  } catch (e) { setSync("Saved on this device"); }
+})();
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const el = (tag, attrs, ...kids) => {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (attrs[k] == null) continue;
+    if (k === "class") n.className = attrs[k];
+    else if (k === "style") n.setAttribute("style", attrs[k]);
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  kids.flat().forEach(k => { if (k == null) return; n.append(k.nodeType ? k : document.createTextNode(k)); });
+  return n;
+};
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const fmtDay = s => parse(s).toLocaleDateString("en-AU", {weekday:"short", day:"numeric", month:"short"});
+const fmtLong = s => parse(s).toLocaleDateString("en-AU", {weekday:"long", day:"numeric", month:"long"});
+const hm = mins => { let h = Math.floor(mins/60), m = mins%60; const ap = h >= 12 ? "pm" : "am"; const h12 = ((h+11)%12)+1; return h12 + ":" + String(m).padStart(2,"0") + ap; };
+const dur = m => m >= 60 ? (Math.floor(m/60) + "h" + (m%60 ? " " + (m%60) + "m" : "")) : m + "m";
+const slot = s => s === "ALL" ? "all" : ((SUBJ[s] && SUBJ[s].slot) || (ORDER.indexOf(s) % 6) + 1);
+const color = s => "var(--c" + slot(s) + ")";
+const tint = s => "var(--t" + slot(s) + ")";
+const isLocal = location.protocol === "file:";
+
+function todayIndex(){
+  const now = new Date(); const t = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  let idx = DAYS.findIndex(d => parse(d.date).getTime() === t);
+  if (idx < 0) idx = t < parse(DAYS[0].date).getTime() ? 0 : DAYS.length - 1;
+  return idx;
+}
+let sel = todayIndex();
+try { const h = location.hash.replace("#",""); if (/^d\d+$/.test(h)) { const i = +h.slice(1); if (DAYS[i]) sel = i; } } catch (e) {}
+
+function stepIds(di, bi){ return DAYS[di].blocks[bi].d.map((_, si) => di + "-" + bi + "-" + si); }
+function dayProgress(di){
+  let t = 0, c = 0;
+  DAYS[di].blocks.forEach((b, bi) => { if (b.exam) return; stepIds(di, bi).forEach(id => { t++; if (done[id]) c++; }); });
+  return t ? c / t : 0;
+}
+function subjProgress(s){
+  let t = 0, c = 0;
+  DAYS.forEach((d, di) => d.blocks.forEach((b, bi) => { if (b.s !== s || b.exam) return; stepIds(di, bi).forEach(id => { t++; if (done[id]) c++; }); }));
+  return t ? c / t : 0;
+}
+function dayMinutes(d){ return d.blocks.reduce((a, b) => a + (b.exam ? 0 : b.m), 0); }
+
+/* ---------- render: exams ---------- */
+function renderExams(){
+  const box = $("#exams"); box.textContent = "";
+  const now = new Date(); const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  ORDER.forEach(s => {
+    const S = SUBJ[s]; const days = Math.round((parse(S.exam) - t0) / 864e5);
+    const pct = Math.round(subjProgress(s) * 100);
+    box.append(el("div", {class:"exam", style:"border-top:3px solid " + color(s)},
+      el("div", {class:"code", style:"color:" + color(s)}, S.code + " · " + S.weight),
+      el("div", {class:"days"}, days > 0 ? days + (days === 1 ? " day" : " days") : days === 0 ? "Today" : "Done"),
+      el("div", {class:"meta"}, fmtDay(S.exam) + ", " + S.time + " · " + pct + "% ticked"),
+      el("div", {class:"bar"}, el("i", {style:"width:" + pct + "%;background:" + color(s)}))
+    ));
+  });
+}
+
+/* ---------- render: calendar ---------- */
+function renderCal(){
+  const cal = $("#cal"); cal.textContent = "";
+  ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(d => cal.append(el("div", {class:"dow"}, d)));
+  for (let k = 0; k < (parse(DAYS[0].date).getDay() + 6) % 7; k++) cal.append(el("div", {class:"cell empty", "aria-hidden":"true"}));
+  const ti = todayIndex(); const realToday = (() => { const n = new Date(); return DAYS.findIndex(d => parse(d.date).toDateString() === n.toDateString()); })();
+  DAYS.forEach((d, i) => {
+    const subs = [...new Set(d.blocks.filter(b => b.s !== "ALL" && !b.exam).map(b => b.s))];
+    const ex = d.blocks.find(b => b.exam);
+    const pct = Math.round(dayProgress(i) * 100);
+    const cell = el("button", {class:"cell" + (i === sel ? " sel" : "") + (i === realToday ? " today" : "") + (ex ? " exam" : ""), style: ex ? "border-color:" + color(ex.s) : "", "aria-label": fmtLong(d.date), onclick: () => { sel = i; try { history.replaceState(null, "", "#d" + i); } catch (e) {} renderCal(); renderDay(); $("#day").scrollIntoView({behavior:"smooth", block:"start"}); }},
+      el("span", {class:"d"}, String(parse(d.date).getDate()) + (i === 0 || parse(d.date).getDate() === 1 ? " " + parse(d.date).toLocaleDateString("en-AU",{month:"short"}) : "")),
+      ex ? el("span", {class:"tag", style:"background:" + tint(ex.s) + ";color:" + color(ex.s)}, SUBJ[ex.s].code + (ex.interview ? " Q&A" : " exam")) : el("span", {class:"h"}, dur(dayMinutes(d))),
+      el("span", {class:"dots"}, subs.map(s => el("i", {style:"background:" + color(s), title:SUBJ[s].code}))),
+      el("span", {class:"fill", style:"width:" + pct + "%"})
+    );
+    cal.append(cell);
+  });
+  const lg = $("#legend"); lg.textContent = "";
+  ORDER.forEach(s => lg.append(el("span", null, el("i", {style:"background:" + color(s)}), SUBJ[s].code)));
+  lg.append(el("span", null, "Bar along the bottom of each day = tasks ticked"));
+}
+
+/* ---------- render: day ---------- */
+function fileRow(f){
+  const [label, path] = f;
+  const win = /^[a-zA-Z]:|^\\\\|^\//.test(path) ? path : BASE + path.replace(/\//g, SEP);
+  const btn = el("button", {type:"button", onclick: e => {
+    const b = e.currentTarget;
+    const ok = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy path", 1400); };
+    try { navigator.clipboard.writeText(win).then(ok, () => { prompt0(win); }); } catch (err) { prompt0(win); }
+  }}, "Copy path");
+  const lbl = isLocal ? el("a", {class:"lbl", href: encodeURI(path).replace(/#/g, "%23"), target:"_blank"}, label) : el("span", {class:"lbl"}, label);
+  return el("div", {class:"file"}, lbl, el("span", {class:"p", title: path}, path), btn);
+}
+function prompt0(text){
+  const s = window.getSelection(); const span = el("span", {class:"mono"}, text);
+  document.body.append(span); const r = document.createRange(); r.selectNodeContents(span); s.removeAllRanges(); s.addRange(r);
+  setTimeout(() => span.remove(), 4000);
+}
+
+function renderDay(){
+  const box = $("#day"); box.textContent = "";
+  const d = DAYS[sel];
+  const mins = dayMinutes(d);
+  const subMins = {};
+  d.blocks.forEach(b => { if (!b.exam && b.s !== "ALL") subMins[b.s] = (subMins[b.s] || 0) + b.m; });
+  box.append(el("div", {class:"dayhead"},
+    el("div", null, el("h2", null, fmtLong(d.date)), el("div", {class:"sub"}, "Day " + (sel + 1) + " of " + DAYS.length + " · " + d.kind)),
+    el("div", {class:"nav"},
+      el("button", {class:"btn", type:"button", onclick: () => { if (sel > 0) { sel--; renderCal(); renderDay(); } }, disabled: sel === 0 ? "" : null}, "← Prev"),
+      el("button", {class:"btn", type:"button", onclick: () => { sel = todayIndex(); renderCal(); renderDay(); }}, "Today"),
+      el("button", {class:"btn", type:"button", onclick: () => { if (sel < DAYS.length - 1) { sel++; renderCal(); renderDay(); } }, disabled: sel === DAYS.length - 1 ? "" : null}, "Next →"))
+  ));
+  const meta = el("div", {class:"daymeta"}, el("span", {class:"pill"}, "Total " + dur(mins)));
+  ORDER.forEach(s => { if (subMins[s]) meta.append(el("span", {class:"pill", style:"background:" + tint(s) + ";color:" + color(s)}, SUBJ[s].code + " " + dur(subMins[s]))); });
+  box.append(meta);
+  box.append(el("div", {class:"focus"}, el("b", null, "Today: "), d.focus));
+  if (!d.clock && d.blocks.length) box.append(el("div", {class:"note"}, CFG.classNote));
+  if (!d.blocks.length) box.append(el("div", {class:"note"}, "Nothing planned: rest day."));
+
+  const list = el("div", {class:"blocks"});
+  let t = CFG.dayStart, lunch = false, dinner = false;
+  const brk = txt => list.append(el("div", {class:"brk"}, el("span", null, hm(t)), txt));
+  const gap = bi => {
+    const next = d.blocks.slice(bi + 1).find(x => x.exam || x.m);
+    if (!next) { brk("Finished for the day"); return; }
+    if (next.at != null) { brk(next.before || "Free time"); if (next.at >= 13 * 60) lunch = true; if (next.at >= 18 * 60 + 30) dinner = true; return; }
+    if (!lunch && t >= 12 * 60 + 15) { brk("Lunch · 45m"); t += 45; lunch = true; }
+    else if (!dinner && t >= 18 * 60) { brk("Dinner · 1h"); t += 60; dinner = true; }
+    else { brk("Break · 10m (move, water, no phone)"); t += 10; }
+  };
+  d.blocks.forEach((b, bi) => {
+    if (d.clock && b.at != null) t = b.at;
+    if (b.exam) {
+      list.append(el("div", {class:"examblk", style:"border-color:" + color(b.s)},
+        el("span", {class:"chip", style:"background:" + tint(b.s) + ";color:" + color(b.s)}, SUBJ[b.s].code),
+        el("span", {class:"big"}, b.t),
+        el("span", {class:"sub"}, hm(b.at) + "–" + hm(b.at + b.m) + " · " + b.room),
+        el("div", {class:"sub", style:"flex-basis:100%"}, "Bring: " + b.bring)));
+      if (d.clock) { t = b.at + b.m; gap(bi); }
+      return;
+    }
+    const when = el("div", {class:"when"});
+    if (d.clock && b.m) { when.append(el("b", null, hm(t)), dur(b.m)); }
+    else if (b.m) { when.append(el("b", null, dur(b.m))); }
+    const ul = el("ul");
+    b.d.forEach((step, si) => {
+      const id = sel + "-" + bi + "-" + si;
+      const li = el("li", {class: done[id] ? "done" : ""});
+      const cb = el("input", {type:"checkbox", id:"c" + id});
+      cb.checked = !!done[id];
+      cb.addEventListener("change", () => {
+        if (cb.checked) done[id] = true; else delete done[id];
+        li.className = cb.checked ? "done" : "";
+        save(); renderExams(); renderCal();
+      });
+      li.append(el("label", {for:"c" + id}, cb, el("span", null, step)));
+      ul.append(li);
+    });
+    const blk = el("div", {class:"blk", style:"border-left-color:" + color(b.s)},
+      when,
+      el("div", {style:"min-width:0"},
+        el("div", {class:"title"}, el("span", {class:"chip", style:"background:" + tint(b.s) + ";color:" + color(b.s)}, SUBJ[b.s].code), el("h3", null, b.t)),
+        ul,
+        b.r.length ? el("div", {class:"res"}, b.r.map(([k, l, u]) => el("a", {href:u, target:"_blank", rel:"noopener"}, el("em", null, k), l))) : null,
+        b.f.length ? el("div", {class:"files"}, b.f.map(fileRow)) : null,
+        b.g ? el("div", {class:"goal"}, b.g) : null
+      ));
+    list.append(blk);
+    if (d.clock && b.m) { t += b.m; gap(bi); }
+  });
+  box.append(list);
+}
+
+/* ---------- render: subjects ---------- */
+function renderSubjects(){
+  const box = $("#view-subjects"); box.textContent = "";
+  const stack = el("div", {class:"stack"});
+  ORDER.forEach(s => {
+    const I = Object.assign({exam:"", style:"", focus:[], practice:[], unknown:[]}, (typeof INFO === "object" && INFO[s]) || {}); const S = SUBJ[s];
+    let total = 0; const sess = [];
+    DAYS.forEach((d, di) => d.blocks.forEach((b, bi) => { if (b.s === s && !b.exam) { total += b.m; sess.push([di, b]); } }));
+    const p = el("div", {class:"panel", style:"border-top:3px solid " + color(s)},
+      el("div", {class:"title"}, el("h2", null, S.code + " · " + S.name)),
+      el("div", {class:"sub"}, (I.exam || (fmtDay(S.exam) + ", " + S.time + " · " + S.weight)) + " · " + dur(total) + " planned · " + Math.round(subjProgress(s)*100) + "% ticked"),
+      el("div", null, I.style),
+      el("div", {class:"grid2"},
+        el("div", null, el("h3", null, "Priorities"), el("ul", null, I.focus.map(x => el("li", null, x)))),
+        el("div", null, el("h3", null, "Course practice you’ll use"), el("ul", null, I.practice.map(x => el("li", null, x))))),
+      el("div", null, el("h3", null, "Check on " + CFG.lms), el("ul", null, I.unknown.map(x => el("li", null, x)))),
+      el("div", null, el("h3", null, "Every session"), el("div", {class:"sessions"}, sess.map(([di, b]) => el("button", {class:"sess", type:"button", onclick: () => { sel = di; showTab("day"); renderCal(); renderDay(); $("#day").scrollIntoView({block:"start"}); }}, el("span", {class:"mono"}, fmtDay(DAYS[di].date)), el("span", null, b.t), el("span", {class:"n"}, dur(b.m))))))
+    );
+    stack.append(p);
+  });
+  box.append(stack);
+}
+
+/* ---------- render: method ---------- */
+function renderMethod(){
+  const box = $("#view-method"); box.textContent = "";
+  box.append(el("div", {class:"stack"},
+    el("div", {class:"panel"}, el("h2", null, "The loop for every new topic"),
+      el("ul", null,
+        el("li", null, el("b", null, "Watch (10–30 min): "), "the linked video, at 1.25–1.5× for long lectures. It gives you the picture before the detail."),
+        el("li", null, el("b", null, "Read the course slides/notes: "), "the exam is written from these. Make a half-page summary as you go."),
+        el("li", null, el("b", null, "Do course questions closed-book: "), "applied/practice sheets first, then workshops. Struggle for 5–10 minutes before checking."),
+        el("li", null, el("b", null, "Check and log: "), "every wrong answer goes in the Mistake Log with what went wrong and the fix."),
+        el("li", null, el("b", null, "Explain it aloud: "), "if you can’t teach the method in 2 minutes, you don’t know it yet."))),
+    el("div", {class:"grid2"},
+      el("div", {class:"panel"}, el("h3", null, "Every day"),
+        el("ul", null,
+          el("li", null, "8:00 recall warm-up: blank-page everything from yesterday"),
+          el("li", null, "10-minute break after each block, away from your phone"),
+          el("li", null, "Close-out: Mistake Log, then read tomorrow’s plan"),
+          el("li", null, "Sleep 7.5+ hours. Memory consolidates overnight"))),
+      el("div", {class:"panel"}, el("h3", null, "Mocks and practice tests"),
+        el("ul", null,
+          el("li", null, "Real past papers beat mocks (mocks are usually easier). The most realistic paper sits at the real exam time"),
+          el("li", null, "No solutions for a past paper? Photograph your working and get it marked the same day"),
+          el("li", null, "Mark strictly, then spend as long fixing as you spent sitting it"),
+          el("li", null, "Finals will be harder than course questions, so the workshops are your stretch work")))),
+    el("div", {class:"grid2"},
+      el("div", {class:"panel"}, el("h3", null, "Exam day"),
+        el("ul", null,
+          el("li", null, "45-minute warm-up only. No new content"),
+          el("li", null, "Read every question first. Start with the one you’re surest of"),
+          el("li", null, "Show full working. Method marks add up"),
+          CFG.examDay.map(x => el("li", null, x)))),
+      el("div", {class:"panel"}, el("h3", null, "How this plan is built"),
+        el("ul", null,
+          CFG.howBuilt.map(x => el("li", null, x)),
+          el("li", null, "Ticks save to your account when signed in, and on this device otherwise")))))
+  );
+}
+
+/* ---------- tabs ---------- */
+function showTab(name){
+  ["day","subjects","method"].forEach(n => {
+    $("#tab-" + n).setAttribute("aria-selected", n === name ? "true" : "false");
+    $("#view-" + n).hidden = n !== name;
+  });
+  if (name === "subjects") renderSubjects();
+  if (name === "method") renderMethod();
+}
+["day","subjects","method"].forEach(n => $("#tab-" + n).addEventListener("click", () => showTab(n)));
+
+function renderAll(){ renderExams(); renderCal(); renderDay(); if (!$("#view-subjects").hidden) renderSubjects(); }
+renderAll();
+</script>
