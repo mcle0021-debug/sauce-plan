@@ -58,3 +58,6 @@ Your planner is a private claude.ai Artifact until you share it from its Share m
 
 ## Credits
 Made by Molly Cleeve. The planner design came out of a semester of exam prep with Claude. The folder layout, wording and `StudyKB` integration follow **Study Sauce** by Sam Roberts. No Study Sauce code is copied here.
+
+## Licence
+MIT. See `LICENSE`. Use it, change it, share it.
